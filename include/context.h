@@ -21,7 +21,7 @@ public:
 private:
   Context() {}
   bool Init();
-  ProgramUPtr m_program;
+  ProgramUPtr m_programOfSkeleton;
 
   int m_width{WINDOW_WIDTH};
   int m_height{WINDOW_HEIGHT};
@@ -52,23 +52,6 @@ private:
     glm::vec3 specular{glm::vec3(1.0f, 1.0f, 1.0f)};
   };
   Light m_light;
-
-  // material parameter
-  struct TexMaterial {
-    TextureUPtr texDiffuse;
-    TextureUPtr texSpecular;
-    Material attribute{"None",
-                       glm::vec3(0.3f),
-                       glm::vec3(0.6f),
-                       glm::vec3(0.5f),
-                       1.0f,
-                       "",
-                       "",
-                       "",
-                       ""};
-  };
-  TexMaterial m_material;
-  ParseUPtr m_parse;
 
   // camera parameter
   bool m_cameraControl{false};

@@ -26,15 +26,15 @@ struct Joint {
 
   glm::mat4 _C;
   glm::mat4 _Cinv;
-  glm::mat4 _ROT; // = CinvMC (C * M * Cinv)
-  glm::vec3 _B;
-  // L = CinvMCB
+  // glm::mat4 _ROT; // = CinvMC (C * M * Cinv)
+  // glm::vec3 _B;
+  // // L = CinvMCB
 
   std::vector<std::string> dof;
   std::vector<glm::vec2> limits;
   std::vector<Joint *> children;
 
-  glm::vec3 cor; // 프레임에서의 최종 좌표
+  glm::vec3 coord; // 프레임에서의 최종 좌표
 };
 
 struct KeyFrame {

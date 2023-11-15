@@ -1,5 +1,26 @@
 #include "skeleton.h"
 
+static glm::mat4 eulerRotation  (float x, float y, float z, int order) {
+	glm::mat4 X = glm::rotate(glm::mat4(1), x, glm::vec3(1, 0, 0));
+	glm::mat4 Y = glm::rotate(glm::mat4(1), y, glm::vec3(0, 1, 0));
+	glm::mat4 Z = glm::rotate(glm::mat4(1), z, glm::vec3(0, 0, 1));
+
+	if (order == EULER_XYZ)
+		return Z * Y * X;
+	else if (order == EULER_XZY)
+		return Y * Z * X;
+	else if (order == EULER_YXZ)
+		return Z * X * Y;
+	else if (order == EULER_YZX)
+		return X * Z * Y;
+	else if (order == EULER_ZXY)
+		return Y * X * Z;
+	else if (order == EULER_ZYX)
+		return X * Y * Z;
+
+	return Z * Y * X;
+}
+
 static void skipWhiteSpace(std::fstream &file) {
   while (1) {
     char c = file.peek();
@@ -279,8 +300,8 @@ bool Skeleton::setBoneData(std::fstream &file) {
         joint._Cinv = glm::inverse(c);
         joint.position = this->globalLengthMultiplier_ * length * direction;
 
-        joint._ROT = joint._C * joint._Cinv;
-        joint._B = joint.position;
+        // joint._ROT = joint._C * joint._Cinv;
+        // joint._B = joint.position;
 
         this->joints.insert(std::pair<std::string, Joint>(joint.name, joint));
         getline(file, buffer);

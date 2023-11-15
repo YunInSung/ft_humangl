@@ -8,45 +8,6 @@
 
 #include <vector>
 
-void print4by4(glm::mat4 m)
-{
-    std::cout.width(10);
-    std::cout << std::right << m[0][0];
-    std::cout.width(10);
-    std::cout << std::right << m[1][0]; 
-    std::cout.width(10);
-    std::cout << std::right << m[2][0];
-    std::cout.width(10);
-    std::cout << std::right << m[3][0] << std::endl;
-
-    std::cout.width(10);
-    std::cout << std::right << m[0][1];
-    std::cout.width(10);
-    std::cout << std::right << m[1][1]; 
-    std::cout.width(10);
-    std::cout << std::right << m[2][1];
-    std::cout.width(10);
-    std::cout << std::right << m[3][1] << std::endl;
-
-    std::cout.width(10);
-    std::cout << std::right << m[0][2];
-    std::cout.width(10);
-    std::cout << std::right << m[1][2]; 
-    std::cout.width(10);
-    std::cout << std::right << m[2][2];
-    std::cout.width(10);
-    std::cout << std::right << m[3][2] << std::endl;
-
-    std::cout.width(10);
-    std::cout << std::right << m[0][3];
-    std::cout.width(10);
-    std::cout << std::right << m[1][3]; 
-    std::cout.width(10);
-    std::cout << std::right << m[2][3];
-    std::cout.width(10);
-    std::cout << std::right << m[3][3] << std::endl;
-}
-
 ContextUPtr Context::Create() 
 {
     auto context = ContextUPtr(new Context());
@@ -118,40 +79,34 @@ void Context::Reshape(int width, int height)
 
 bool Context::Init() 
 {
-    m_parse = Parse::Load("./resource/teapot.obj");
-    if (!m_parse)
-        return false;
-    auto materials = m_parse->getMaterials();
-    if (materials.size() > 0)
-        m_material.attribute = materials[0]; // material을 담아놓긴 하는데, 어떤 방식으로 사용할지가 미정;;
-    auto vertices = m_parse->getVBO();
-    // auto indices = m_parse->getIndices();
+    // m_parse = Parse::Load("./resource/teapot.obj");
+    // if (!m_parse)
+    //     return false;
+    // auto materials = m_parse->getMaterials();
+    // if (materials.size() > 0)
+    //     m_material.attribute = materials[0]; // material을 담아놓긴 하는데, 어떤 방식으로 사용할지가 미정;;
+    // auto vertices = m_parse->getVBO();
+    // // auto indices = m_parse->getIndices();
 
-    m_vertexArrayObject = VertexLayout::Create();
-    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.get(), m_parse->getFace().size() * 3 * 8 * sizeof(float));
+    // m_vertexArrayObject = VertexLayout::Create();
+    // m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.get(), m_parse->getFace().size() * 3 * 8 * sizeof(float));
 
-    m_vertexArrayObject->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
-    m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3); // 컬러값이 시작되는 부분이 어디서 부터인가?의 값이 sizeof(float) * 3이다
-    // stride는 vertex와 vertex 사이의 간격이다.
-    // offset 얼만큼의 offset만큼 띄워서 시작하는 것인지를 뜻한다.
-    m_vertexArrayObject->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
+    // m_vertexArrayObject->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+    // m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
+    // m_vertexArrayObject->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
 
-    // EBO생성
-    // m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices.get(), sizeof(uint32_t) * (m_parse->getFace().size() * 3));
-
-    
 
     m_program = Program::Create("./shader/lighting.vs", "./shader/lighting.fs");
     if (!m_program)
         return false;
     glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
 
-    // Texture
-    m_material.texDiffuse = Texture::CreateFromImage(Image::Load("./images/earth.png").get());
-    m_material.texSpecular = Texture::CreateFromImage(Image::Load("./images/container2_specular.png").get());
-    if (m_material.texDiffuse == nullptr || m_material.texSpecular == nullptr) {
-        return false;
-    }
+    // // Texture
+    // m_material.texDiffuse = Texture::CreateFromImage(Image::Load("./images/earth.png").get());
+    // m_material.texSpecular = Texture::CreateFromImage(Image::Load("./images/container2_specular.png").get());
+    // if (m_material.texDiffuse == nullptr || m_material.texSpecular == nullptr) {
+    //     return false;
+    // }
 
     auto model = glm::rotate(glm::mat4(1.0f),
         glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)
@@ -192,10 +147,10 @@ void Context::Render()
         }
         
         if (ImGui::CollapsingHeader("material", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::ColorEdit3("m.ambient", glm::value_ptr(m_material.attribute.ambient));
-            ImGui::ColorEdit3("m.diffuse", glm::value_ptr(m_material.attribute.diffuse));
-            ImGui::ColorEdit3("m.specular", glm::value_ptr(m_material.attribute.specular));
-            ImGui::DragFloat("m.shininess", &m_material.attribute.shininess, 1.0f, 1.0f, 256.0f);
+            // ImGui::ColorEdit3("m.ambient", glm::value_ptr(m_material.attribute.ambient));
+            // ImGui::ColorEdit3("m.diffuse", glm::value_ptr(m_material.attribute.diffuse));
+            // ImGui::ColorEdit3("m.specular", glm::value_ptr(m_material.attribute.specular));
+            // ImGui::DragFloat("m.shininess", &m_material.attribute.shininess, 1.0f, 1.0f, 256.0f);
         }
         ImGui::Checkbox("animation", &m_animation);
         ImGui::Checkbox("texture", &m_texture);
@@ -227,19 +182,19 @@ void Context::Render()
     m_program->SetUniform("light.diffuse", m_light.diffuse);
     m_program->SetUniform("light.specular", m_light.specular);
 
-    m_program->SetUniform("material.ambient", m_material.attribute.ambient);
-    m_program->SetUniform("material.diffuse", m_material.attribute.diffuse);
-    m_program->SetUniform("material.TexDiffuse", 0);
+    // m_program->SetUniform("material.ambient", m_material.attribute.ambient);
+    // m_program->SetUniform("material.diffuse", m_material.attribute.diffuse);
+    // m_program->SetUniform("material.TexDiffuse", 0);
     
-    m_program->SetUniform("material.specular", m_material.attribute.specular);
-    m_program->SetUniform("material.shininess", m_material.attribute.shininess);
-    m_program->SetUniform("m_texture", m_texture);
+    // m_program->SetUniform("material.specular", m_material.attribute.specular);
+    // m_program->SetUniform("material.shininess", m_material.attribute.shininess);
+    // m_program->SetUniform("m_texture", m_texture);
 
     // Texture
-    glActiveTexture(GL_TEXTURE0);// glActiveTexture는 앞으로 내가 건드릴 텍스트 슬롯의 번호를 알려준다.
-    m_material.texDiffuse->Bind();// 0번 슬롯에 할당할 텍스처는 2d 텍스처이고 그 텍스처를 할당한다.
-    glActiveTexture(GL_TEXTURE1);
-    m_material.texSpecular->Bind();
+    // glActiveTexture(GL_TEXTURE0);// glActiveTexture는 앞으로 내가 건드릴 텍스트 슬롯의 번호를 알려준다.
+    // m_material.texDiffuse->Bind();// 0번 슬롯에 할당할 텍스처는 2d 텍스처이고 그 텍스처를 할당한다.
+    // glActiveTexture(GL_TEXTURE1);
+    // m_material.texSpecular->Bind();
 
     auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f));
     model = glm::rotate(model, 
@@ -248,5 +203,5 @@ void Context::Render()
     auto transform = projection * view * model;
     m_program->SetUniform("transform", transform);
     m_program->SetUniform("modelTransform", model);
-    glDrawArrays(GL_TRIANGLES, 0, m_parse->getFace().size() * 3 * 8);
+    // glDrawArrays(GL_TRIANGLES, 0, m_parse->getFace().size() * 3 * 8);
 }
