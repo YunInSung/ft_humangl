@@ -90,11 +90,11 @@ bool Context::Init()
 
     auto VBO = std::unique_ptr<float[]>(new float[8]);
     VBO[0] = 0.0f;
-    VBO[1] = 1.0f;
-    VBO[2] = 1.0f;
+    VBO[1] = 0.5f;
+    VBO[2] = 0.5f;
     VBO[3] = 1.0f;
     VBO[4] = 1.0f;
-    VBO[5] = 0.0f;
+    VBO[5] = 1.0f;
     VBO[6] = 0.0f;
     VBO[7] = 0.0f;
 
@@ -102,8 +102,8 @@ bool Context::Init()
     m_vertexArrayObject = VertexLayout::Create();
     m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, VBO.get(), 8 * sizeof(float));
 
-    m_vertexArrayObject->SetAttrib(0, 1, GL_INT, GL_FALSE, sizeof(float) * 4, 0);
-    m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, sizeof(float) * 3);
+    m_vertexArrayObject->SetAttrib(0, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+    m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, sizeof(float) * 1);
     // m_vertexArrayObject->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
 
 
@@ -176,7 +176,7 @@ void Context::Render()
     glEnable(GL_DEPTH_TEST);
 
     m_program->Use();
-    glm::vec4 tmp = glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+    glm::vec4 tmp = glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f))  * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
     m_cameraFront = glm::vec3(tmp.x, tmp.y, tmp.z);
 
     m_light.position = m_cameraPos;
@@ -189,12 +189,12 @@ void Context::Render()
     m_program->Use();
     m_program->SetUniform("COLOR", glm::vec4({0.0f, 0.0f, 0.0f, 1.0f}));
 
-    auto rootTransform = glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 5.0f, -5.0f)),
-                                            glm::radians(30.0f),
+    auto rootTransform = glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
+                                            glm::radians( 90.0f),
                                             glm::vec3(0.0f, 1.0f, 0.0f));
     auto childTransform= glm::rotate(glm::mat4(1.0f),
-                                            glm::radians(30.0f),
-                                            glm::vec3(1.0f, 0.0f, 0.0f));
+                                            glm::radians((float)glfwGetTime() * 45.0f),
+                                            glm::vec3(0.0f, 1.0f, 0.0f));
 
     m_program->SetUniform("rootTransform", rootTransform);
     m_program->SetUniform("childTransform", childTransform);
@@ -216,5 +216,5 @@ void Context::Render()
         glm::vec3(0.0f, 1.0f, 0.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("MVP", transform);
-    glDrawArrays(GL_LINE, 0, 8);
+    glDrawArrays(GL_LINES, 0, 8);
 }

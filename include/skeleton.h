@@ -32,9 +32,6 @@ struct Joint {
 
   std::vector<std::string> dof;
   std::vector<glm::vec2> limits;
-  std::vector<Joint *> children;
-
-  glm::vec3 coord; // 프레임에서의 최종 좌표
 };
 
 struct KeyFrame {
@@ -52,8 +49,6 @@ private:
   float mass_;
   float globalLengthMultiplier_;
   bool isDegree_;
-
-  glm::vec3 rootPos;
 
   std::map<std::string, Joint> joints;
   std::map<std::string, std::vector<std::string>> hierarchy; // 부모 자식 관계도

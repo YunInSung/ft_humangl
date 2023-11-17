@@ -188,7 +188,7 @@ bool Skeleton::setRoot(std::fstream &file) {
     } else if (buffer == "position") {
       check[2] = true;
       for (int i = 0; i < 3; i++)
-        file >> this->rootPos[i];
+        file >> root.position[i];
     } else if (buffer == "orientation") {
       check[3] = true;
       for (int i = 0; i < 3; i++)
@@ -204,7 +204,6 @@ bool Skeleton::setRoot(std::fstream &file) {
       eulerRotation(root.axis[0], root.axis[1], root.axis[2], root.eulerOrder);
   root._C = c;
   root._Cinv = glm::inverse(c);
-  root.position = glm::vec3(0, 0, 0);
 
   for (int i = 0; i < 4; i++) {
     if (!check[i])
