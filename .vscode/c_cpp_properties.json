@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/include/glm",
-                "${workspaceFolder}/build/install/include"
+                "${workspaceFolder}/build/install/include",
+                "${workspaceFolder}/**",
             ],
             "defines": [],
             "macFrameworkPath": [

@@ -21,6 +21,7 @@ public:
 private:
   Context() {}
   bool Init();
+  ProgramUPtr m_program;
   ProgramUPtr m_programOfSkeleton;
 
   int m_width{WINDOW_WIDTH};
@@ -31,7 +32,7 @@ private:
   BufferUPtr m_indexBuffer;
 
   // animation
-  bool m_animation{true};
+  bool m_animation{false};
 
   // texture
   bool m_texture{true};

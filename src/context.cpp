@@ -1,7 +1,7 @@
 #include "context.h"
 #include "GLFW/glfw3.h"
-#include "image.h"
 #include <imgui.h>
+#include "image.h"
 
 #include <ios>
 #include <iostream>
@@ -88,18 +88,32 @@ bool Context::Init()
     // auto vertices = m_parse->getVBO();
     // // auto indices = m_parse->getIndices();
 
-    // m_vertexArrayObject = VertexLayout::Create();
-    // m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.get(), m_parse->getFace().size() * 3 * 8 * sizeof(float));
+    auto VBO = std::unique_ptr<float[]>(new float[8]);
+    VBO[0] = 0.0f;
+    VBO[1] = 1.0f;
+    VBO[2] = 1.0f;
+    VBO[3] = 1.0f;
+    VBO[4] = 1.0f;
+    VBO[5] = 0.0f;
+    VBO[6] = 0.0f;
+    VBO[7] = 0.0f;
 
-    // m_vertexArrayObject->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
-    // m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
+
+    m_vertexArrayObject = VertexLayout::Create();
+    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, VBO.get(), 8 * sizeof(float));
+
+    m_vertexArrayObject->SetAttrib(0, 1, GL_INT, GL_FALSE, sizeof(float) * 4, 0);
+    m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, sizeof(float) * 3);
     // m_vertexArrayObject->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
 
 
-    m_program = Program::Create("./shader/lighting.vs", "./shader/lighting.fs");
+    m_program = Program::Create("./shader/skeleton.vs", "./shader/skeleton.fs");
     if (!m_program)
         return false;
     glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+
+    m_program->Use();
+    m_vertexArrayObject->Bind();
 
     // // Texture
     // m_material.texDiffuse = Texture::CreateFromImage(Image::Load("./images/earth.png").get());
@@ -109,7 +123,7 @@ bool Context::Init()
     // }
 
     auto model = glm::rotate(glm::mat4(1.0f),
-        glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)
+        glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f)
     );
     // auto view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
     auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
@@ -137,13 +151,13 @@ void Context::Render()
             m_cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
         }
         if (ImGui::CollapsingHeader("light", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::DragFloat3("l.position", glm::value_ptr(m_light.position), 0.01f);
-            ImGui::DragFloat3("l.direction", glm::value_ptr(m_light.direction), 0.01f);
-            ImGui::DragFloat2("l.cutoff", glm::value_ptr(m_light.cutoff), 0.5f, 0.0f, 180.0f);
-            ImGui::DragFloat("l.distance", &m_light.distance, 0.5f, 0.0f, 3000.0f);
-            ImGui::ColorEdit3("l.ambient", glm::value_ptr(m_light.ambient));
-            ImGui::ColorEdit3("l.diffuse", glm::value_ptr(m_light.diffuse));
-            ImGui::ColorEdit3("l.specular", glm::value_ptr(m_light.specular));
+            // ImGui::DragFloat3("l.position", glm::value_ptr(m_light.position), 0.01f);
+            // ImGui::DragFloat3("l.direction", glm::value_ptr(m_light.direction), 0.01f);
+            // ImGui::DragFloat2("l.cutoff", glm::value_ptr(m_light.cutoff), 0.5f, 0.0f, 180.0f);
+            // ImGui::DragFloat("l.distance", &m_light.distance, 0.5f, 0.0f, 3000.0f);
+            // ImGui::ColorEdit3("l.ambient", glm::value_ptr(m_light.ambient));
+            // ImGui::ColorEdit3("l.diffuse", glm::value_ptr(m_light.diffuse));
+            // ImGui::ColorEdit3("l.specular", glm::value_ptr(m_light.specular));
         }
         
         if (ImGui::CollapsingHeader("material", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -173,17 +187,17 @@ void Context::Render()
     auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
 
     m_program->Use();
-    m_program->SetUniform("viewPos", m_cameraPos);
-    m_program->SetUniform("light.position", m_light.position);
-    m_program->SetUniform("light.direction", m_light.direction);
-    m_program->SetUniform("light.cutoff", glm::vec2(cosf(glm::radians(m_light.cutoff[0])), cosf(glm::radians(m_light.cutoff[0] + m_light.cutoff[1]))));
-    m_program->SetUniform("light.attenuation", GetAttenuationCoeff(m_light.distance));
-    m_program->SetUniform("light.ambient", m_light.ambient);
-    m_program->SetUniform("light.diffuse", m_light.diffuse);
-    m_program->SetUniform("light.specular", m_light.specular);
+    m_program->SetUniform("COLOR", glm::vec4({0.0f, 0.0f, 0.0f, 1.0f}));
 
-    // m_program->SetUniform("material.ambient", m_material.attribute.ambient);
-    // m_program->SetUniform("material.diffuse", m_material.attribute.diffuse);
+    auto rootTransform = glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 5.0f, -5.0f)),
+                                            glm::radians(30.0f),
+                                            glm::vec3(0.0f, 1.0f, 0.0f));
+    auto childTransform= glm::rotate(glm::mat4(1.0f),
+                                            glm::radians(30.0f),
+                                            glm::vec3(1.0f, 0.0f, 0.0f));
+
+    m_program->SetUniform("rootTransform", rootTransform);
+    m_program->SetUniform("childTransform", childTransform);
     // m_program->SetUniform("material.TexDiffuse", 0);
     
     // m_program->SetUniform("material.specular", m_material.attribute.specular);
@@ -201,7 +215,6 @@ void Context::Render()
         glm::radians((m_animation ? (float)glfwGetTime() : 0.0f) * 120.0f ),
         glm::vec3(0.0f, 1.0f, 0.0f));
     auto transform = projection * view * model;
-    m_program->SetUniform("transform", transform);
-    m_program->SetUniform("modelTransform", model);
-    // glDrawArrays(GL_TRIANGLES, 0, m_parse->getFace().size() * 3 * 8);
+    m_program->SetUniform("MVP", transform);
+    glDrawArrays(GL_LINE, 0, 8);
 }
