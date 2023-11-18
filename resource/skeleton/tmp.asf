@@ -1,0 +1,168 @@
+# AST/ASF file generated using VICON BodyLanguage
+# -----------------------------------------------
+:version 1.10
+:name VICON
+:units
+  mass 1.0
+  length 1
+  angle deg
+:documentation
+   .ast/.asf automatically generated from VICON data using
+   VICON BodyBuilder and BodyLanguage model FoxedUp or BRILLIANT.MOD
+:root
+   order TX TY TZ RX RY RZ
+   axis XYZ
+   position 0 0 0  
+   orientation 0 0 0 
+:bonedata
+  begin
+     id 1 
+     name belly
+     direction 0 1 0
+     length 1 
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name neck
+     direction 0 1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name head
+     direction 0 1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name rshoulder
+     direction -1 0 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name relbow
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name rwrist
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name lshoulder
+     direction 1 0 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name lelbow
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name lwrist
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name rpelvis
+     direction -1 0 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name rknee
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name rheel
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name lpelvis
+     direction 1 0 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name lknee
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+  begin
+     id 1 
+     name lheel
+     direction 0 -1 0
+     length 1
+     axis 0 0 0  XYZ
+     dof rx ry rz
+  end
+:hierarchy
+  begin
+    root belly rpelvis lpelvis
+    belly neck
+    neck head rshoulder lshoulder
+    rshoulder relbow
+    relbow rwrist
+    lshoulder lelbow
+    lelbow lwrist
+    rpelvis rknee
+    rknee rheel
+    lpelvis lknee
+    lknee lheel
+  end
+
+root
+belly
+neck
+head
+rshoulder
+relbow
+rwrist
+lshoulder
+lelbow
+lwrist
+rpelvis
+rknee
+rheel
+lpelvis
+lknee
+lheel

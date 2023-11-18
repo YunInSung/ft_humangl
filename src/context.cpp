@@ -79,36 +79,15 @@ void Context::Reshape(int width, int height)
 
 bool Context::Init() 
 {
-    // m_parse = Parse::Load("./resource/teapot.obj");
-    // if (!m_parse)
-    //     return false;
-    // auto materials = m_parse->getMaterials();
-    // if (materials.size() > 0)
-    //     m_material.attribute = materials[0]; // material을 담아놓긴 하는데, 어떤 방식으로 사용할지가 미정;;
-    // auto vertices = m_parse->getVBO();
-    // // auto indices = m_parse->getIndices();
-
-    auto VBO = std::unique_ptr<float[]>(new float[16]);
-    VBO[0] = 0.0f;
-    VBO[1] = 0.5f;
-    VBO[2] = 0.5f;
-    VBO[3] = 1.0f;
-    VBO[4] = 1.0f;
-    VBO[5] = 1.0f;
-    VBO[6] = 0.0f;
-    VBO[7] = 0.0f;
-    VBO[8] = 1.0f;
-    VBO[9] = 1.0f;
-    VBO[10] = 0.0f;
-    VBO[11] = 0.0f;
-    VBO[12] = 2.0f;
-    VBO[13] = 0.5f;
-    VBO[14] = 0.0f;
-    VBO[15] = 0.0f;
-
+    auto skeleton = Skeleton::Load("./resource/skeleton/143.asf", "./resource/motion/143.amc");
+    if (skeleton == nullptr)
+        return false;
+    std::cout << "here2" << std::endl;
+    auto VBO = skeleton->getVBO();
+    this->VBOsize = skeleton->getVBOsize();
 
     m_vertexArrayObject = VertexLayout::Create();
-    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, VBO.get(), 16 * sizeof(float));
+    m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, VBO.get(), VBOsize * sizeof(float));
 
     m_vertexArrayObject->SetAttrib(0, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
     m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, sizeof(float) * 1);
@@ -224,5 +203,5 @@ void Context::Render()
         glm::vec3(0.0f, 1.0f, 0.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("MVP", transform);
-    glDrawArrays(GL_LINES, 0, 16);
+    glDrawArrays(GL_LINES, 0, VBOsize);
 }

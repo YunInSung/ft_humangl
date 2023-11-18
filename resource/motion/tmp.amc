@@ -1,0 +1,71 @@
+#!OML:ASF H:\Terrain\Patient Classification 1\PLAYGROUND\JustinFriday\JustinFriday.ASF
+:FULLY-SPECIFIED
+:DEGREES
+1
+root 0 0 0 0 0 0
+belly 0 0 0
+neck 0 0 0
+head 0 0 0
+rshoulder 0 0 0
+relbow 0 0 0
+rwrist 0 0 0
+lshoulder 0 0 0
+lelbow 0 0 0
+lwrist 0 0 0
+rpelvis 0 0 0
+rknee 0 0 0
+rheel 0 0 0
+lpelvis 0 0 0
+lknee 0 0 0
+lheel 0 0 0
+2
+root 0 0 0 0 0 0
+belly 0 0 0
+neck 0 0 0
+head 0 0 0
+rshoulder 0 0 0
+relbow -45 0 0
+rwrist 0 0 0
+lshoulder 0 0 0
+lelbow 45 0 0
+lwrist 0 0 0
+rpelvis 0 0 0
+rknee 45 0 0
+rheel 0 0 0
+lpelvis 0 0 0
+lknee -45 0 0
+lheel 0 0 0
+3
+root 0 0 0 0 0 0
+belly 0 0 0
+neck 0 0 0
+head 0 0 0
+rshoulder 0 0 0
+relbow 0 0 0
+rwrist 0 0 0
+lshoulder 0 0 0
+lelbow 0 0 0
+lwrist 0 0 0
+rpelvis 0 0 0
+rknee 0 0 0
+rheel 0 0 0
+lpelvis 0 0 0
+lknee 0 0 0
+lheel 0 0 0
+4
+root 0 0 0 0 0 0
+belly 0 0 0
+neck 0 0 0
+head 0 0 0
+rshoulder 0 0 0
+relbow 45 0 0
+rwrist 0 0 0
+lshoulder 0 0 0
+lelbow -45 0 0
+lwrist 0 0 0
+rpelvis 0 0 0
+rknee -45 0 0
+rheel 0 0 0
+lpelvis 0 0 0
+lknee 45 0 0
+lheel 0 0 0

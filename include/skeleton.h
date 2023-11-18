@@ -69,14 +69,17 @@ class Skeleton {
     std::vector<KeyFrame> keyFrame;
 
     bool setAMC(std::string const &filename);
+
+    std::vector<Joint> retChildren(const std::string& parentName);
   public:
     ~Skeleton() {}
     static SkeletonUPtr Load(const std::string& ASFpath, const std::string& AMCpath);
 
-    std::unique_ptr<float[]> getVBO() const;
+    std::unique_ptr<float[]> getVBO();
+    uint32_t getVBOsize();
 };
 
-static void SkipEmptyChar(std::fstream &in_stream);
+static void skipWhiteSpace(std::fstream &file);
 static glm::mat4 eulerRotation(float x, float y, float z, int order);
 static std::string peekWord(std::fstream &file);
 static std::string peekLine(std::fstream &file);

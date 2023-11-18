@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "vertex_layout.h"
+#include "skeleton.h"
 
 CLASS_PTR(Context)
 class Context {
@@ -30,6 +31,8 @@ private:
   VertexLayoutUPtr m_vertexArrayObject;
   BufferUPtr m_vertexBuffer;
   BufferUPtr m_indexBuffer;
+
+  uint32_t VBOsize;
 
   // animation
   bool m_animation{false};

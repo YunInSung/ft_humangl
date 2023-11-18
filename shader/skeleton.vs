@@ -15,13 +15,13 @@ bool equalCheck(float a, float b)
 
 void main() {
   vec4 position = vec4(pos, 1.0);
-  if (equalCheck(id, 0.0f))
-  {
-	  position = rootTransform * position;
-  }
-  else if (equalCheck(id, 1.0f))
-  {
-    position = rootTransform * childTransform * position;
-  }
+  // if (equalCheck(id, 0.0f))
+  // {
+	//   position = rootTransform * position;
+  // }
+  // else if (equalCheck(id, 1.0f))
+  // {
+  //   position = rootTransform * childTransform * position;
+  // }
   gl_Position = MVP * position;
 }

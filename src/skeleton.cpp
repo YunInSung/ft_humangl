@@ -3,6 +3,7 @@
 SkeletonUPtr Skeleton::Load(const std::string& ASFpath, const std::string& AMCpath)
 {
   auto skeleton = SkeletonUPtr(new Skeleton());
+  std::cout << "here1" << std::endl;
 	if (!skeleton->setASF(ASFpath)) {
 		return nullptr;
   }
@@ -105,15 +106,19 @@ bool Skeleton::setASF(std::string const &filename) {
       } else if (buffer == "units") {
         if (!this->setUnit(file))
           return false;
+        std::cout << "units" << std::endl;
       } else if (buffer == "root") {
         if (!this->setRoot(file))
           return false;
+        std::cout << "root" << std::endl;
       } else if (buffer == "bonedata") {
         if (!this->setBoneData(file))
           return false;
+        std::cout << "bonedata" << std::endl;
       } else if (buffer == "hierarchy") {
         if (!this->setHierarchy(file))
           return false;
+        std::cout << "hierarchy" << std::endl;
       }
     } else {
       std::cout << "부적적한 ASF 파일" << std::endl;
@@ -301,9 +306,11 @@ bool Skeleton::setBoneData(std::fstream &file) {
       } else if (buffer == "dof") {
         if (!this->setBoneDataDof(file, joint))
           return false;
+        std::cout << "dof" << std::endl;
       } else if (buffer == "limits") {
         if (!this->setBoneDataLimits(file, joint))
           return false;
+        std::cout << "limits" << std::endl;
       } else if (buffer == "end") {
         glm::mat4 c = eulerRotation(joint.axis[0], joint.axis[1], joint.axis[2],
                                     joint.eulerOrder);
@@ -500,12 +507,46 @@ bool Skeleton::setAMC(std::string const &filename) {
   return true;
 }
 
-std::unique_ptr<float[]> Skeleton::getVBO() const {
-  Joint parent = joints["root"];
+std::vector<Joint> Skeleton::retChildren(const std::string& parentName) {
+  std::vector<std::string> childrenList = hierarchy[parentName];
   std::vector<Joint> children;
 
-  while(true)
+  for (std::vector<std::string>::iterator it = childrenList.begin() ; it != childrenList.end() ; it++)
   {
-
+    children.push_back(joints[*it]);
   }
+  return children;
+}
+
+uint32_t Skeleton::getVBOsize() {
+  uint32_t size = 0;
+  for (std::map<std::string, std::vector<std::string>>::iterator it = hierarchy.begin() ; it != hierarchy.end() ; it++) {
+    size += it->second.size();
+  }
+  return size;
+}
+
+std::unique_ptr<float[]> Skeleton::getVBO() {
+  uint32_t size = getVBOsize();
+  auto VBO = std::unique_ptr<float[]>(new float[size * 8]);
+  uint32_t VBOidx = 0;
+
+  for (std::map<std::string, std::vector<std::string>>::iterator iter = hierarchy.begin() ; iter != hierarchy.end() ; iter++) {
+  
+    Joint parent = joints[iter->first];
+    std::vector<Joint> children = this->retChildren(iter->first);
+
+    for (std::vector<Joint>::iterator it = children.begin() ; it != children.end() ; it++)
+    {
+      VBO[VBOidx++] = static_cast<float>(parent.index);
+      VBO[VBOidx++] = parent.position.x;
+      VBO[VBOidx++] = parent.position.y;
+      VBO[VBOidx++] = parent.position.z;
+      VBO[VBOidx++] = static_cast<float>((*it).index);
+      VBO[VBOidx++] = (*it).position.x;
+      VBO[VBOidx++] = (*it).position.y;
+      VBO[VBOidx++] = (*it).position.z;
+    }
+  }
+  return std::move(VBO);
 }
