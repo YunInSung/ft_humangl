@@ -1,5 +1,17 @@
 #include "skeleton.h"
 
+SkeletonUPtr Skeleton::Load(const std::string& ASFpath, const std::string& AMCpath)
+{
+  auto skeleton = SkeletonUPtr(new Skeleton());
+	if (!skeleton->setASF(ASFpath)) {
+		return nullptr;
+  }
+  if (!skeleton->setAMC(AMCpath)) {
+    return nullptr;
+  }
+	return std::move(skeleton);
+}
+
 static glm::mat4 eulerRotation  (float x, float y, float z, int order) {
 	glm::mat4 X = glm::rotate(glm::mat4(1), x, glm::vec3(1, 0, 0));
 	glm::mat4 Y = glm::rotate(glm::mat4(1), y, glm::vec3(0, 1, 0));
@@ -486,4 +498,14 @@ bool Skeleton::setAMC(std::string const &filename) {
 
   file.close();
   return true;
+}
+
+std::unique_ptr<float[]> Skeleton::getVBO() const {
+  Joint parent = joints["root"];
+  std::vector<Joint> children;
+
+  while(true)
+  {
+
+  }
 }

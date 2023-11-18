@@ -42,33 +42,38 @@ struct KeyFrame {
 
 CLASS_PTR(Skeleton)
 class Skeleton {
-private:
-  std::string version;
-  std::string name;
-  std::string documentation;
-  float mass_;
-  float globalLengthMultiplier_;
-  bool isDegree_;
+  private:
+    Skeleton() {}
+    std::string version;
+    std::string name;
+    std::string documentation;
+    float mass_;
+    float globalLengthMultiplier_;
+    bool isDegree_;
 
-  std::map<std::string, Joint> joints;
-  std::map<std::string, std::vector<std::string>> hierarchy; // 부모 자식 관계도
+    std::map<std::string, Joint> joints;
+    std::map<std::string, std::vector<std::string>> hierarchy; // 부모 자식 관계도
 
-  bool setASF(std::string const &filename);
-  bool setUnit(std::fstream &file);
-  bool setRoot(std::fstream &file);
-  bool setRootOrder(std::fstream &file, Joint &root);
-  bool setBoneData(std::fstream &file);
-  bool setBoneDataDof(std::fstream &file, Joint &joint);
-  bool setBoneDataLimits(std::fstream &file, Joint &joint);
-  bool setHierarchy(std::fstream &file);
+    bool setASF(std::string const &filename);
+    bool setUnit(std::fstream &file);
+    bool setRoot(std::fstream &file);
+    bool setRootOrder(std::fstream &file, Joint &root);
+    bool setBoneData(std::fstream &file);
+    bool setBoneDataDof(std::fstream &file, Joint &joint);
+    bool setBoneDataLimits(std::fstream &file, Joint &joint);
+    bool setHierarchy(std::fstream &file);
 
-  std::string AMC_Filename;
-  bool isSpecified;
-  bool AMCisRad;
-  std::vector<KeyFrame> keyFrame;
+    std::string AMC_Filename;
+    bool isSpecified;
+    bool AMCisRad;
+    std::vector<KeyFrame> keyFrame;
 
-  bool loadAcclaimMotionFile(const std::string &sFilePath);
-  bool setAMC(std::string const &filename);
+    bool setAMC(std::string const &filename);
+  public:
+    ~Skeleton() {}
+    static SkeletonUPtr Load(const std::string& ASFpath, const std::string& AMCpath);
+
+    std::unique_ptr<float[]> getVBO() const;
 };
 
 static void SkipEmptyChar(std::fstream &in_stream);
