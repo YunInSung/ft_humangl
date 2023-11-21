@@ -79,10 +79,9 @@ void Context::Reshape(int width, int height)
 
 bool Context::Init() 
 {
-    auto skeleton = Skeleton::Load("./resource/skeleton/143.asf", "./resource/motion/143.amc");
+    skeleton = Skeleton::Load("./resource/skeleton/143.asf", "./resource/motion/143.amc");
     if (skeleton == nullptr)
         return false;
-    std::cout << "here2" << std::endl;
     auto VBO = skeleton->getVBO();
     this->VBOsize = skeleton->getVBOsize();
 
@@ -98,6 +97,8 @@ bool Context::Init()
     if (!m_program)
         return false;
     glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+
+    this->initTime = (float)glfwGetTime();
 
     m_program->Use();
     m_vertexArrayObject->Bind();
@@ -173,29 +174,11 @@ void Context::Render()
         (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
     auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
 
+    float nowTime = (float)glfwGetTime() - this->initTime;
+
     m_program->Use();
     m_program->SetUniform("COLOR", glm::vec4({0.0f, 0.0f, 0.0f, 1.0f}));
-
-    auto rootTransform = glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
-                                            glm::radians( 90.0f),
-                                            glm::vec3(0.0f, 1.0f, 0.0f));
-    auto childTransform= glm::rotate(glm::mat4(1.0f),
-                                            glm::radians((float)glfwGetTime() * 45.0f),
-                                            glm::vec3(0.0f, 1.0f, 0.0f));
-
-    m_program->SetUniform("rootTransform", rootTransform);
-    m_program->SetUniform("childTransform", childTransform);
-    // m_program->SetUniform("material.TexDiffuse", 0);
-    
-    // m_program->SetUniform("material.specular", m_material.attribute.specular);
-    // m_program->SetUniform("material.shininess", m_material.attribute.shininess);
-    // m_program->SetUniform("m_texture", m_texture);
-
-    // Texture
-    // glActiveTexture(GL_TEXTURE0);// glActiveTexture는 앞으로 내가 건드릴 텍스트 슬롯의 번호를 알려준다.
-    // m_material.texDiffuse->Bind();// 0번 슬롯에 할당할 텍스처는 2d 텍스처이고 그 텍스처를 할당한다.
-    // glActiveTexture(GL_TEXTURE1);
-    // m_material.texSpecular->Bind();
+    m_program->SetUniform("Transforms", skeleton->getTransMats(nowTime), skeleton->getJointsSize());
 
     auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f));
     model = glm::rotate(model, 

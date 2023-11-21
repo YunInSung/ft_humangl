@@ -20,6 +20,7 @@ class Program {
         void SetUniform(const std::string& name, const glm::vec3& value) const;
         void SetUniform(const std::string& name, const glm::vec4& value) const;
         void SetUniform(const std::string& name, glm::mat4& value) const;
+        void SetUniform(const std::string& name, std::vector<glm::mat4> value, GLsizei size) const;
     private:
         Program() {}
         bool Link(const std::vector<ShaderPtr>& shaders);

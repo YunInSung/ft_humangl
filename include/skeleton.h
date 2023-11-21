@@ -53,6 +53,10 @@ class Skeleton {
 
     std::map<std::string, Joint> joints;
     std::map<std::string, std::vector<std::string>> hierarchy; // 부모 자식 관계도
+    std::map<std::string, std::vector<uint32_t>> hierarchyOfGrandChild;
+    void recursiveHierarchy(std::string bone);
+    void recursiveMultiplyMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime);
+    glm::mat4 makeMotionMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime);
 
     bool setASF(std::string const &filename);
     bool setUnit(std::fstream &file);
@@ -71,11 +75,14 @@ class Skeleton {
     bool setAMC(std::string const &filename);
 
     std::vector<Joint> retChildren(const std::string& parentName);
+    std::vector<glm::mat4> transforms;
   public:
     ~Skeleton() {}
     static SkeletonUPtr Load(const std::string& ASFpath, const std::string& AMCpath);
 
     std::unique_ptr<float[]> getVBO();
+    int getJointsSize() const;
+    std::vector<glm::mat4> getTransMats(float nowTime);
     uint32_t getVBOsize();
 };
 
@@ -84,5 +91,6 @@ static glm::mat4 eulerRotation(float x, float y, float z, int order);
 static std::string peekWord(std::fstream &file);
 static std::string peekLine(std::fstream &file);
 static std::string trim(std::string &str);
+static uint32_t eulerOrder (std::vector<std::string>);
 
 #endif

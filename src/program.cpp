@@ -92,3 +92,12 @@ void Program::SetUniform(const std::string& name, glm::mat4& value) const {
 	auto loc = glGetUniformLocation(m_program, name.c_str());
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
+
+void Program::SetUniform(const std::string& name, std::vector<glm::mat4> value, GLsizei size) const {
+	auto loc = glGetUniformLocation(m_program, name.c_str());
+	std::vector<GLfloat> flattenedMatrices;
+	for (const glm::mat4& matrix : value) {
+		flattenedMatrices.insert(flattenedMatrices.end(), glm::value_ptr(matrix), glm::value_ptr(matrix) + 16);
+	}
+	glUniformMatrix4fv(loc, size, GL_FALSE, flattenedMatrices.data());
+}

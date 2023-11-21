@@ -32,7 +32,9 @@ private:
   BufferUPtr m_vertexBuffer;
   BufferUPtr m_indexBuffer;
 
+  SkeletonUPtr skeleton;
   uint32_t VBOsize;
+  float initTime{0.0f};
 
   // animation
   bool m_animation{false};
