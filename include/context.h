@@ -43,7 +43,7 @@ private:
   bool m_texture{true};
 
   // clear color
-  glm::vec4 m_clearColor{glm::vec4(0.1f, 0.2f, 0.3f, 0.0f)};
+  glm::vec4 m_clearColor{glm::vec4(1.0f, 1.0f, 1.0f, 0.0f)};
 
   // light parameter
   struct Light {

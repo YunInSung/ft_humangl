@@ -508,9 +508,7 @@ std::vector<Joint> Skeleton::retChildren(const std::string& parentName) {
   std::vector<Joint> children;
 
   for (std::vector<std::string>::iterator it = childrenList.begin() ; it != childrenList.end() ; it++)
-  {
     children.push_back(joints[*it]);
-  }
   return children;
 }
 
@@ -603,16 +601,17 @@ glm::mat4 Skeleton::makeMotionMat(KeyFrame& first, KeyFrame& second, std::string
 }
 
 
-std::vector<glm::mat4> Skeleton::getTransMats(float nowTime) {
+std::vector<glm::mat4> Skeleton::getTransMats(float& nowTime) {
   uint32_t size = this->joints.size();
   transforms.clear();
   transforms = std::vector<glm::mat4>(size, glm::mat4(1.0f));
 
-  while (nowTime >= this->keyFrame.back().time)
-		nowTime -= this->keyFrame.back().time;
+  while (nowTime >= this->keyFrame.back().time) {
+    nowTime -= this->keyFrame.back().time;
+  }
 
   KeyFrame first, second;
-  for (int idx = 0; idx < keyFrame.size() ; idx++) {
+  for (int idx = 0; idx < keyFrame.size() - 1 ; idx++) {
     if (nowTime >= keyFrame[idx].time) {
       if (nowTime <= keyFrame[idx + 1].time) {
         first = keyFrame[idx];

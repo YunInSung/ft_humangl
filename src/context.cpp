@@ -96,7 +96,7 @@ bool Context::Init()
     m_program = Program::Create("./shader/skeleton.vs", "./shader/skeleton.fs");
     if (!m_program)
         return false;
-    glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     this->initTime = (float)glfwGetTime();
 
@@ -181,9 +181,6 @@ void Context::Render()
     m_program->SetUniform("Transforms", skeleton->getTransMats(nowTime), skeleton->getJointsSize());
 
     auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f));
-    model = glm::rotate(model, 
-        glm::radians((m_animation ? (float)glfwGetTime() : 0.0f) * 120.0f ),
-        glm::vec3(0.0f, 1.0f, 0.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("MVP", transform);
     glDrawArrays(GL_LINES, 0, VBOsize);

@@ -82,7 +82,7 @@ class Skeleton {
 
     std::unique_ptr<float[]> getVBO();
     int getJointsSize() const;
-    std::vector<glm::mat4> getTransMats(float nowTime);
+    std::vector<glm::mat4> getTransMats(float& nowTime);
     uint32_t getVBOsize();
 };
 

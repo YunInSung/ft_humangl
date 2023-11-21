@@ -13,6 +13,7 @@ bool equalCheck(float a, float b)
 }
 
 void main() {
-  vec4 position = Transforms[int(id)] * vec4(pos, 1.0);
+  vec4 position = Transforms[int(floor(id + 0.5))] * vec4(pos, 1.0);
+  // vec4 position = vec4(pos, 1.0);
   gl_Position = MVP * position;
 }
