@@ -178,9 +178,9 @@ void Context::Render()
 
     m_program->Use();
     m_program->SetUniform("COLOR", glm::vec4({0.0f, 0.0f, 0.0f, 1.0f}));
-    m_program->SetUniform("Transforms", skeleton->getTransMats(nowTime), skeleton->getJointsSize());
+    m_program->SetUniform("TransForms", std::vector<glm::mat4>(31, glm::mat4(1.0f)), 31);
 
-    auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f));
+    auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("MVP", transform);
     glDrawArrays(GL_LINES, 0, VBOsize);

@@ -12,10 +12,6 @@ SkeletonUPtr Skeleton::Load(const std::string& ASFpath, const std::string& AMCpa
 	return std::move(skeleton);
 }
 
-static uint32_t eulerOrder (std::vector<std::string>) {
-
-}
-
 static glm::mat4 eulerRotation  (float x, float y, float z, int order) {
 	glm::mat4 X = glm::rotate(glm::mat4(1), x, glm::vec3(1, 0, 0));
 	glm::mat4 Y = glm::rotate(glm::mat4(1), y, glm::vec3(0, 1, 0));
@@ -269,8 +265,8 @@ bool Skeleton::setBoneData(std::fstream &file) {
       else if (buffer == "direction") {
         float value;
         for (int i = 0; i < 3; i++) {
-          file >> value;
-          direction[i] = value;
+          file >> direction[i];
+          // direction[i] = value;
         }
         direction = glm::normalize(direction);
       } else if (buffer == "length")
@@ -560,12 +556,12 @@ void Skeleton::recursiveHierarchy(std::string bone) {
 void Skeleton::recursiveMultiplyMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime) {
   std::vector<uint32_t> childrenIdx;
   glm::mat4 transfrom = makeMotionMat(first, second, bone, deltaTime);
-  transforms[joints[bone].index] *= transfrom;
+  transforms[joints[bone].index] = transfrom * transforms[joints[bone].index];
   if (hierarchy.find(bone) != hierarchy.end()) {
     std::vector<std::string> boneOfchildren = hierarchy[bone];
     std::vector<uint32_t> boneEffectIdx = hierarchyOfGrandChild[bone];
     for (int idx = 0 ; idx < boneEffectIdx.size() ; idx++) {
-      transforms[boneEffectIdx[idx]] *= transfrom;
+      transforms[boneEffectIdx[idx]] = transfrom * transforms[boneEffectIdx[idx]];
     }
     for (int i = 0 ; i < boneOfchildren.size() ; i++) {
       recursiveMultiplyMat(first, second, boneOfchildren[i], deltaTime);
@@ -585,17 +581,17 @@ glm::mat4 Skeleton::makeMotionMat(KeyFrame& first, KeyFrame& second, std::string
   for (int idx = 0 ; idx < boneJoint.dof.size() ; idx++)
   {
     if (boneJoint.dof[idx] == "tx")
-      ret *= glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], 0.0f, 0.0f));
+      ret = glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], 0.0f, 0.0f)) * ret;
     else if (boneJoint.dof[idx] == "ty")
-      ret *= glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, motion[1], 0.0f));
+      ret = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, motion[1], 0.0f)) * ret;
     else if (boneJoint.dof[idx] == "tz")
-      ret *= glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, motion[2]));
+      ret = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, motion[2])) * ret;
     else if (boneJoint.dof[idx] == "rx")
-      ret *= glm::rotate(glm::mat4(1.0f), motion[3], glm::vec3(1.0f, 0.0f, 0.0f));
+      ret = glm::rotate(glm::mat4(1.0f), motion[3], glm::vec3(1.0f, 0.0f, 0.0f)) * ret;
     else if (boneJoint.dof[idx] == "ry")
-      ret *= glm::rotate(glm::mat4(1.0f), motion[4], glm::vec3(0.0f, 1.0f, 0.0f));
+      ret = glm::rotate(glm::mat4(1.0f), motion[4], glm::vec3(0.0f, 1.0f, 0.0f)) * ret;
     else if (boneJoint.dof[idx] == "rz")
-      ret *= glm::rotate(glm::mat4(1.0f), motion[5], glm::vec3(0.0f, 0.0f, 1.0f));
+      ret = glm::rotate(glm::mat4(1.0f), motion[5], glm::vec3(0.0f, 0.0f, 1.0f)) * ret;
   }
   return ret;
 }

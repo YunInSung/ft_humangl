@@ -91,6 +91,5 @@ static glm::mat4 eulerRotation(float x, float y, float z, int order);
 static std::string peekWord(std::fstream &file);
 static std::string peekLine(std::fstream &file);
 static std::string trim(std::string &str);
-static uint32_t eulerOrder (std::vector<std::string>);
 
 #endif
