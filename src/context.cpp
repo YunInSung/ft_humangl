@@ -183,5 +183,6 @@ void Context::Render()
     auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("MVP", transform);
-    glDrawArrays(GL_LINES, 0, VBOsize);
+    glPointSize(10);   
+    glDrawArrays(GL_POINTS, 0, VBOsize);
 }
