@@ -122,7 +122,9 @@ bool Skeleton::setASF(std::string const &filename) {
     }
   }
   file.close();
-  recursiveHierarchy("root");
+  hierarchyOfGrandChild = std::vector<std::vector<uint32_t>>(joints.size(), std::vector<uint32_t>());
+  recursiveHierarchy("root", 0);
+  setPos("root");
   return true;
 }
 
@@ -403,7 +405,6 @@ bool Skeleton::setHierarchy(std::fstream &file) {
     this->hierarchy.insert(std::make_pair(parent, childs));
   }
   return true;
-  ;
 }
 
 bool Skeleton::setAMC(std::string const &filename) {
@@ -541,27 +542,40 @@ std::unique_ptr<float[]> Skeleton::getVBO() {
   return std::move(VBO);
 }
 
-void Skeleton::recursiveHierarchy(std::string bone) {
-  std::vector<uint32_t> childrenIdx;
+void Skeleton::recursiveHierarchy(std::string bone, uint32_t idx) {
   if (hierarchy.find(bone) != hierarchy.end()) {
     std::vector<std::string> boneOfchildren = hierarchy[bone];
     for (int i = 0 ; i < boneOfchildren.size() ; i++) {
-      childrenIdx.push_back(joints[boneOfchildren[i]].index);
-      recursiveHierarchy(boneOfchildren[i]);
+      hierarchyOfGrandChild[idx].push_back(joints[boneOfchildren[i]].index);
+      recursiveHierarchy(boneOfchildren[i], idx);
     }
-    hierarchyOfGrandChild.insert(std::make_pair(bone, childrenIdx));
+    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
+      recursiveHierarchy(boneOfchildren[i], joints[boneOfchildren[i]].index);
+    }
+  }
+}
+
+void Skeleton::setPos(std::string bone) {
+  if (hierarchy.find(bone) != hierarchy.end()) {
+    std::vector<std::string> boneOfchildren = hierarchy[bone];
+    Joint boneOfJoint = joints[bone];
+    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
+      joints[boneOfchildren[i]].position += boneOfJoint.position;
+    }
+    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
+      setPos(boneOfchildren[i]);
+    }
   }
 }
 
 void Skeleton::recursiveMultiplyMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime) {
-  std::vector<uint32_t> childrenIdx;
   glm::mat4 transfrom = makeMotionMat(first, second, bone, deltaTime);
   transforms[joints[bone].index] = transfrom * transforms[joints[bone].index];
   if (hierarchy.find(bone) != hierarchy.end()) {
     std::vector<std::string> boneOfchildren = hierarchy[bone];
-    std::vector<uint32_t> boneEffectIdx = hierarchyOfGrandChild[bone];
+    std::vector<uint32_t> boneEffectIdx = hierarchyOfGrandChild[joints[bone].index];
     for (int idx = 0 ; idx < boneEffectIdx.size() ; idx++) {
-      transforms[boneEffectIdx[idx]] = transfrom * transforms[boneEffectIdx[idx]];
+      transforms[boneEffectIdx[idx]] = transforms[boneEffectIdx[idx]] * transfrom;
     }
     for (int i = 0 ; i < boneOfchildren.size() ; i++) {
       recursiveMultiplyMat(first, second, boneOfchildren[i], deltaTime);
@@ -578,21 +592,11 @@ glm::mat4 Skeleton::makeMotionMat(KeyFrame& first, KeyFrame& second, std::string
   for (int i = 0 ; i < firstMotion.size() ; i++) {
     motion.push_back(glm::lerp(firstMotion[i], secondMotion[i], deltaTime));
   }
-  for (int idx = 0 ; idx < boneJoint.dof.size() ; idx++)
-  {
-    if (boneJoint.dof[idx] == "tx")
-      ret = glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], 0.0f, 0.0f)) * ret;
-    else if (boneJoint.dof[idx] == "ty")
-      ret = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, motion[1], 0.0f)) * ret;
-    else if (boneJoint.dof[idx] == "tz")
-      ret = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, motion[2])) * ret;
-    else if (boneJoint.dof[idx] == "rx")
-      ret = glm::rotate(glm::mat4(1.0f), motion[3], glm::vec3(1.0f, 0.0f, 0.0f)) * ret;
-    else if (boneJoint.dof[idx] == "ry")
-      ret = glm::rotate(glm::mat4(1.0f), motion[4], glm::vec3(0.0f, 1.0f, 0.0f)) * ret;
-    else if (boneJoint.dof[idx] == "rz")
-      ret = glm::rotate(glm::mat4(1.0f), motion[5], glm::vec3(0.0f, 0.0f, 1.0f)) * ret;
+  if (bone == "root") {
+    ret = glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], motion[1], motion[2])) * ret;
   }
+  if (firstMotion.size() > 0)
+    ret = eulerRotation(motion[3], motion[4], motion[5], boneJoint.eulerOrder) * ret;
   return ret;
 }
 

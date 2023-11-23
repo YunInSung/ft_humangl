@@ -53,8 +53,9 @@ class Skeleton {
 
     std::map<std::string, Joint> joints;
     std::map<std::string, std::vector<std::string>> hierarchy; // 부모 자식 관계도
-    std::map<std::string, std::vector<uint32_t>> hierarchyOfGrandChild;
-    void recursiveHierarchy(std::string bone);
+    std::vector<std::vector<uint32_t>> hierarchyOfGrandChild;
+    void recursiveHierarchy(std::string bone, uint32_t idx);
+    void setPos(std::string bone);
     void recursiveMultiplyMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime);
     glm::mat4 makeMotionMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime);
 
