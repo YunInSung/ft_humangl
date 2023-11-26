@@ -122,9 +122,6 @@ bool Skeleton::setASF(std::string const &filename) {
     }
   }
   file.close();
-  hierarchyOfGrandChild = std::vector<std::vector<uint32_t>>(joints.size(), std::vector<uint32_t>());
-  recursiveHierarchy("root", 0);
-  setPos("root");
   return true;
 }
 
@@ -445,7 +442,7 @@ bool Skeleton::setAMC(std::string const &filename) {
       if (this->keyFrame.size() + 1 != frame.sequence) {
         std::exit(-1);
       }
-      frame.time = frame.sequence / FRAMERATE;
+      frame.time = (frame.sequence - 1) / FRAMERATE;
       this->keyFrame.push_back(frame);
     } else {
       std::string jointName;
@@ -530,54 +527,25 @@ std::unique_ptr<float[]> Skeleton::getVBO() {
     for (std::vector<Joint>::iterator it = children.begin() ; it != children.end() ; it++)
     {
       VBO[VBOidx++] = static_cast<float>(parent.index);
-      VBO[VBOidx++] = parent.position.x;
-      VBO[VBOidx++] = parent.position.y;
-      VBO[VBOidx++] = parent.position.z;
+      VBO[VBOidx++] = 0;
+      VBO[VBOidx++] = 0;
+      VBO[VBOidx++] = 0;
       VBO[VBOidx++] = static_cast<float>((*it).index);
-      VBO[VBOidx++] = (*it).position.x;
-      VBO[VBOidx++] = (*it).position.y;
-      VBO[VBOidx++] = (*it).position.z;
+      VBO[VBOidx++] = 0;
+      VBO[VBOidx++] = 0;
+      VBO[VBOidx++] = 0;
     }
   }
   return std::move(VBO);
 }
 
-void Skeleton::recursiveHierarchy(std::string bone, uint32_t idx) {
-  if (hierarchy.find(bone) != hierarchy.end()) {
-    std::vector<std::string> boneOfchildren = hierarchy[bone];
-    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
-      hierarchyOfGrandChild[idx].push_back(joints[boneOfchildren[i]].index);
-      recursiveHierarchy(boneOfchildren[i], idx);
-    }
-    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
-      recursiveHierarchy(boneOfchildren[i], joints[boneOfchildren[i]].index);
-    }
-  }
-}
-
-void Skeleton::setPos(std::string bone) {
-  if (hierarchy.find(bone) != hierarchy.end()) {
-    std::vector<std::string> boneOfchildren = hierarchy[bone];
-    Joint boneOfJoint = joints[bone];
-    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
-      joints[boneOfchildren[i]].position += boneOfJoint.position;
-    }
-    for (int i = 0 ; i < boneOfchildren.size() ; i++) {
-      setPos(boneOfchildren[i]);
-    }
-  }
-}
-
 void Skeleton::recursiveMultiplyMat(KeyFrame& first, KeyFrame& second, std::string bone, float deltaTime) {
   glm::mat4 transfrom = makeMotionMat(first, second, bone, deltaTime);
-  transforms[joints[bone].index] = transfrom * transforms[joints[bone].index];
+  transforms[joints[bone].index] = transforms[joints[bone].index] * transfrom;
   if (hierarchy.find(bone) != hierarchy.end()) {
     std::vector<std::string> boneOfchildren = hierarchy[bone];
-    std::vector<uint32_t> boneEffectIdx = hierarchyOfGrandChild[joints[bone].index];
-    for (int idx = 0 ; idx < boneEffectIdx.size() ; idx++) {
-      transforms[boneEffectIdx[idx]] = transforms[boneEffectIdx[idx]] * transfrom;
-    }
     for (int i = 0 ; i < boneOfchildren.size() ; i++) {
+      transforms[joints[boneOfchildren[i]].index] = transforms[joints[bone].index];
       recursiveMultiplyMat(first, second, boneOfchildren[i], deltaTime);
     }
   }
@@ -589,19 +557,22 @@ glm::mat4 Skeleton::makeMotionMat(KeyFrame& first, KeyFrame& second, std::string
   std::vector<float> secondMotion = second.motions[bone];
   std::vector<float> motion;
   glm::mat4 ret = glm::mat4(1.0f);
-  for (int i = 0 ; i < firstMotion.size() ; i++) {
+  for (int i = 0 ; i < firstMotion.size() && i < secondMotion.size() ; i++) {
     motion.push_back(glm::lerp(firstMotion[i], secondMotion[i], deltaTime));
   }
   if (bone == "root") {
+    std::cout << motion[0] << " " <<  motion[1] << " " <<  motion[2] << std::endl;
     ret = glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], motion[1], motion[2])) * ret;
   }
-  if (firstMotion.size() > 0)
+  if (firstMotion.size() > 0 && secondMotion.size() > 0) {
     ret = eulerRotation(motion[3], motion[4], motion[5], boneJoint.eulerOrder) * ret;
-  return ret;
+  }
+  return boneJoint._C * ret * boneJoint._Cinv * glm::translate(glm::mat4(1.0f), boneJoint.position);
 }
 
 
-std::vector<glm::mat4> Skeleton::getTransMats(float& nowTime) {
+std::vector<glm::mat4> Skeleton::getTransMats(float& initTime) {
+  float nowTime = (float)glfwGetTime() - initTime;
   uint32_t size = this->joints.size();
   transforms.clear();
   transforms = std::vector<glm::mat4>(size, glm::mat4(1.0f));
@@ -610,21 +581,25 @@ std::vector<glm::mat4> Skeleton::getTransMats(float& nowTime) {
     nowTime -= this->keyFrame.back().time;
   }
 
+
   KeyFrame first, second;
   for (int idx = 0; idx < keyFrame.size() - 1 ; idx++) {
-    if (nowTime >= keyFrame[idx].time) {
-      if (nowTime <= keyFrame[idx + 1].time) {
-        first = keyFrame[idx];
-        second = keyFrame[idx + 1];
-        break;
-      }
+    if (nowTime >= keyFrame[idx].time && nowTime <= keyFrame[idx + 1].time) {
+      first = keyFrame[idx];
+      second = keyFrame[idx + 1];
+      break;
     }
   }
-  float deltaRatio = 1 - ((second.time - nowTime) / (second.time - first.time));
+
+  float deltaRatio = ((second.time - nowTime) / (second.time - first.time));
 
   recursiveMultiplyMat(first, second, "root", deltaRatio);
+  if (second.sequence == this->keyFrame.back().sequence) {
+    initTime += nowTime;
+  }
   return transforms;
 }
+
 
 int Skeleton::getJointsSize() const {
   return this->joints.size();

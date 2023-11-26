@@ -103,19 +103,11 @@ bool Context::Init()
     m_program->Use();
     m_vertexArrayObject->Bind();
 
-    // // Texture
-    // m_material.texDiffuse = Texture::CreateFromImage(Image::Load("./images/earth.png").get());
-    // m_material.texSpecular = Texture::CreateFromImage(Image::Load("./images/container2_specular.png").get());
-    // if (m_material.texDiffuse == nullptr || m_material.texSpecular == nullptr) {
-    //     return false;
-    // }
-
     auto model = glm::rotate(glm::mat4(1.0f),
         glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f)
     );
-    // auto view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
     auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
-    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width/(float)m_height, 0.01f, 10.0f);
+    auto projection = glm::perspective(glm::radians(45.0f), (float)m_width/(float)m_height, 0.01f, 100.0f);
     auto transform = projection * view * model;
     m_program->SetUniform("transform", transform);
     
@@ -164,25 +156,19 @@ void Context::Render()
     glEnable(GL_DEPTH_TEST);
 
     m_program->Use();
-    glm::vec4 tmp = glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f))  * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-    m_cameraFront = glm::vec3(tmp.x, tmp.y, tmp.z);
-
-    m_light.position = m_cameraPos;
-    m_light.direction = m_cameraFront;
 
     auto projection = glm::perspective(glm::radians(45.0f),
-        (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
+        (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 150.0f);
     auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
-
-    float nowTime = (float)glfwGetTime() - this->initTime;
 
     m_program->Use();
     m_program->SetUniform("COLOR", glm::vec4({0.0f, 0.0f, 0.0f, 1.0f}));
-    m_program->SetUniform("TransForms", skeleton->getTransMats(nowTime), skeleton->getJointsSize());
+    m_program->SetUniform("TransForms", skeleton->getTransMats(initTime), skeleton->getJointsSize());
 
-    auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -30.0f));
+    auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -50.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("MVP", transform);
-    // glPointSize(10);
+    glPointSize(10);
+    glDrawArrays(GL_POINTS, 0, VBOsize);
     glDrawArrays(GL_LINES, 0, VBOsize);
 }
