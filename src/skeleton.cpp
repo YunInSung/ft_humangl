@@ -562,10 +562,10 @@ glm::mat4 Skeleton::makeMotionMat(KeyFrame& first, KeyFrame& second, std::string
   }
   if (bone == "root") {
     std::cout << motion[0] << " " <<  motion[1] << " " <<  motion[2] << std::endl;
-    ret = glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], motion[1], motion[2])) * ret;
+    ret = ret * glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], motion[1], motion[2]));
   }
   if (firstMotion.size() > 0 && secondMotion.size() > 0) {
-    ret = eulerRotation(motion[3], motion[4], motion[5], boneJoint.eulerOrder) * ret;
+    ret = ret * eulerRotation(motion[3], motion[4], motion[5], boneJoint.eulerOrder);
   }
   return boneJoint._C * ret * boneJoint._Cinv * glm::translate(glm::mat4(1.0f), boneJoint.position);
 }
@@ -591,7 +591,7 @@ std::vector<glm::mat4> Skeleton::getTransMats(float& initTime) {
     }
   }
 
-  float deltaRatio = ((second.time - nowTime) / (second.time - first.time));
+  float deltaRatio = 1 - ((second.time - nowTime) / (second.time - first.time));
 
   recursiveMultiplyMat(first, second, "root", deltaRatio);
   if (second.sequence == this->keyFrame.back().sequence) {
