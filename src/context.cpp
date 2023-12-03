@@ -88,8 +88,8 @@ bool Context::Init()
     m_vertexArrayObject = VertexLayout::Create();
     m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, VBO.get(), VBOsize * sizeof(float));
 
-    m_vertexArrayObject->SetAttrib(0, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
-    m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, sizeof(float) * 1);
+    m_vertexArrayObject->SetAttrib(0, 1, GL_INT, GL_FALSE, sizeof(int) * 1, 0);
+    // m_vertexArrayObject->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(int) * 2, sizeof(int) * 1);
     // m_vertexArrayObject->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
 
 

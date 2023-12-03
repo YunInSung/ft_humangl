@@ -8,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-#define FRAMERATE 60.f
+#define FRAMERATE 90.f
 
 #define EULER_XYZ 0
 #define EULER_XZY 1
@@ -78,7 +78,7 @@ class Skeleton {
     ~Skeleton() {}
     static SkeletonUPtr Load(const std::string& ASFpath, const std::string& AMCpath);
 
-    std::unique_ptr<float[]> getVBO();
+    std::unique_ptr<int[]> getVBO();
     int getJointsSize() const;
     std::vector<glm::mat4> getTransMats(float& initTime);
     uint32_t getVBOsize();

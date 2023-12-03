@@ -511,12 +511,12 @@ uint32_t Skeleton::getVBOsize() {
   for (std::map<std::string, std::vector<std::string>>::iterator it = hierarchy.begin() ; it != hierarchy.end() ; it++) {
     size += it->second.size();
   }
-  return size * 8;
+  return size * 2;
 }
 
-std::unique_ptr<float[]> Skeleton::getVBO() {
+std::unique_ptr<int[]> Skeleton::getVBO() {
   uint32_t size = getVBOsize();
-  auto VBO = std::unique_ptr<float[]>(new float[size]);
+  auto VBO = std::unique_ptr<int[]>(new int[size]);
   uint32_t VBOidx = 0;
 
   for (std::map<std::string, std::vector<std::string>>::iterator iter = hierarchy.begin() ; iter != hierarchy.end() ; iter++) {
@@ -526,14 +526,8 @@ std::unique_ptr<float[]> Skeleton::getVBO() {
 
     for (std::vector<Joint>::iterator it = children.begin() ; it != children.end() ; it++)
     {
-      VBO[VBOidx++] = static_cast<float>(parent.index);
-      VBO[VBOidx++] = 0;
-      VBO[VBOidx++] = 0;
-      VBO[VBOidx++] = 0;
-      VBO[VBOidx++] = static_cast<float>((*it).index);
-      VBO[VBOidx++] = 0;
-      VBO[VBOidx++] = 0;
-      VBO[VBOidx++] = 0;
+      VBO[VBOidx++] = (parent.index);
+      VBO[VBOidx++] = ((*it).index);
     }
   }
   return std::move(VBO);
@@ -561,13 +555,12 @@ glm::mat4 Skeleton::makeMotionMat(KeyFrame& first, KeyFrame& second, std::string
     motion.push_back(glm::lerp(firstMotion[i], secondMotion[i], deltaTime));
   }
   if (bone == "root") {
-    std::cout << motion[0] << " " <<  motion[1] << " " <<  motion[2] << std::endl;
     ret = ret * glm::translate(glm::mat4(1.0f), glm::vec3(motion[0], motion[1], motion[2]));
   }
   if (firstMotion.size() > 0 && secondMotion.size() > 0) {
     ret = ret * eulerRotation(motion[3], motion[4], motion[5], boneJoint.eulerOrder);
   }
-  return boneJoint._C * ret * boneJoint._Cinv * glm::translate(glm::mat4(1.0f), boneJoint.position);
+  return (boneJoint._C * ret * boneJoint._Cinv) * glm::translate(glm::mat4(1.0f), boneJoint.position);
 }
 
 
